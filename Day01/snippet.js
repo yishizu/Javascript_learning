@@ -1,3 +1,5 @@
+const { process_params } = require("express/lib/router");
+
 console.log("Hello World!");
 
 let x;
@@ -84,7 +86,7 @@ class Histogram{
             if(a[1]===b[1]){
                 return a[0] <b[0] ? -1:1;
             }else{
-                return b[1] -a[1];
+                return b[1] - a[1];
             }
         });
         //
@@ -97,7 +99,17 @@ class Histogram{
         let lines = entries.map(
             ([l,n]) => `${l}: ${"#".repeat(Math.round(n))} ${n.toFixed(2)}%`);
 
-        return lines.join("/n");
+        return lines.join("\n");
         
     }
 }
+
+async function histogramFromStdin(){
+    process.stdin.setEncoding("utf-8");
+    let histogram = new Histogram();
+    for await(let chunk of process.stdin){
+        histogram.add(chunk);
+    }
+    return histogram;
+}
+histogramFromStdin().then(histogram =>{console.log(histogram.toString());});
